@@ -6,22 +6,37 @@ import { ButtonComponent } from '../../atoms/button/button.component';
 import { Task } from '../../../features/task/task.model';
 import { TaskItemComponent } from '../../molecules/task-item/task-item.component';
 import { TaskEditComponent } from '../../molecules/task-add-edit/task-edit.component';
+import { AdaptiveWorkflowService } from '../../../features/lnasf/adaptive-workflow.service';
+import { AdaptiveWorkflowPanelComponent } from '../../../features/lnasf/adaptive-workflow-panel.component';
+import type { WorkflowAction } from '../../../features/lnasf/workflow-transition-model';
+
+type TaskFilter = 'all' | 'active' | 'completed';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TaskItemComponent, ButtonComponent, TaskEditComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TaskItemComponent,
+    ButtonComponent,
+    TaskEditComponent,
+    AdaptiveWorkflowPanelComponent,
+  ],
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css']
 })
 export class TaskListComponent implements OnInit {
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
-  filter: 'all' | 'active' | 'completed' = 'active'; 
+  filter: TaskFilter = 'active';
   editingTask: Task | null = null;
   editMode: 'edit' | 'add' = 'edit';
 
-  constructor(private taskService: TaskService) {}
+  constructor(
+    private taskService: TaskService,
+    private adaptiveWorkflow: AdaptiveWorkflowService,
+  ) {}
 
   ngOnInit() {
     this.taskService.tasks$.subscribe(tasks => {
@@ -57,7 +72,7 @@ export class TaskListComponent implements OnInit {
 
   openAddModal() {
     this.editMode = 'add';
-    this.editingTask = {} as Task; 
+    this.editingTask = {} as Task;
   }
 
   closeEdit() {
@@ -78,8 +93,22 @@ export class TaskListComponent implements OnInit {
     this.editingTask = null;
   }
 
-  setFilter(filter: 'all' | 'active' | 'completed') {
+  setFilter(filter: TaskFilter) {
+    if (filter !== this.filter) {
+      this.adaptiveWorkflow.recordAction(`filter:${filter}` as WorkflowAction);
+    }
     this.filter = filter;
     this.applyFilter();
+  }
+
+  applySuggestedAction(action: WorkflowAction): void {
+    if (action === 'task:add') {
+      this.openAddModal();
+      return;
+    }
+
+    if (action === 'filter:all' || action === 'filter:active' || action === 'filter:completed') {
+      this.setFilter(action.slice('filter:'.length) as TaskFilter);
+    }
   }
 }

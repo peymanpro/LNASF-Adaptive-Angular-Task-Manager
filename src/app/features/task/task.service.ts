@@ -4,13 +4,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { Store } from '@ngrx/store';
 import { incrementActiveTasks, decrementActiveTasks, setActiveTasksCount } from './store/task.actions';
 import { Task } from './task.model';
+import { AdaptiveWorkflowService } from '../lnasf/adaptive-workflow.service';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
   private tasksSubject = new BehaviorSubject<Task[]>([]);
   tasks$ = this.tasksSubject.asObservable();
 
-  constructor(private store: Store) {
+  constructor(
+    private store: Store,
+    private adaptiveWorkflow: AdaptiveWorkflowService,
+  ) {
     this.loadFromLocalStorage();
   }
 
@@ -39,6 +43,7 @@ export class TaskService {
     this.tasksSubject.next([newTask, ...current]);
     this.saveToLocalStorage();
     this.store.dispatch(incrementActiveTasks());
+    this.adaptiveWorkflow.recordAction('task:add');
   }
 
   toggleComplete(id: string): void {
@@ -50,12 +55,11 @@ export class TaskService {
     task.completed = !task.completed;
     this.tasksSubject.next([...tasks]);
     this.saveToLocalStorage();
+    this.adaptiveWorkflow.recordAction(wasCompleted ? 'task:reopen' : 'task:complete');
 
     if (wasCompleted) {
-    
       this.store.dispatch(incrementActiveTasks());
     } else {
-  
       this.store.dispatch(decrementActiveTasks());
     }
   }
@@ -63,11 +67,14 @@ export class TaskService {
   deleteTask(id: string): void {
     const tasks = this.tasksSubject.getValue();
     const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
     const filtered = tasks.filter(t => t.id !== id);
     this.tasksSubject.next(filtered);
     this.saveToLocalStorage();
+    this.adaptiveWorkflow.recordAction('task:delete');
 
-    if (task && !task.completed) {
+    if (!task.completed) {
       this.store.dispatch(decrementActiveTasks());
     }
   }
@@ -77,11 +84,11 @@ export class TaskService {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
 
-    
     const oldCompleted = task.completed;
     Object.assign(task, updates);
     this.tasksSubject.next([...tasks]);
     this.saveToLocalStorage();
+    this.adaptiveWorkflow.recordAction('task:edit');
 
     if (updates.completed !== undefined && updates.completed !== oldCompleted) {
       if (updates.completed) {

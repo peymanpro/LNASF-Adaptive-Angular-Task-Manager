@@ -1,164 +1,129 @@
-markdown
-# ✅ Angular Standalone Task Manager
+# Angular Standalone Task Manager
 
-A modern task management application built with **Angular 19** using **Standalone Components** and **Atomic Design** pattern, featuring **NgRx** for state management demonstration.
+A responsive task-management application built with Angular 19 standalone components. It demonstrates feature-oriented organization, a lightweight RxJS state service, a small NgRx counter, and a practical implementation of selected **Learning-Native Adaptive Software Framework (LNASF)** principles.
 
-## 🖼️ Screenshots
+## Screenshots
 
-### Home Page
-![Home Page](./public/home.png)
+### Home page
+![Home page](./public/home.png)
 
-### My Task Manager
-![My Task Manager](./public/mytaskmanagement.png)
+### Task manager
+![Task manager](./public/mytaskmanagement.png)
 
-### Add New Task Modal
-![Add New Task](./public/newtask.png)
+### Add task
+![Add task](./public/newtask.png)
 
-### Edit Task Modal
-![Add New Task](./public/edittask.png)
+### Edit task
+![Edit task](./public/edittask.png)
 
-## ✨ Features
+## Features
 
-- 📋 Add, edit, and delete tasks
-- ✅ Mark tasks as complete / incomplete
-- 🔍 Filter tasks by status (All, Active, Completed)
-- 📱 Responsive design
-- 💾 Data persisted in localStorage
-- 🎨 Professional SVG icons
-- 🧭 Multi-page routing (Home, About, Task Manager)
-- 🎯 Reactive state management with BehaviorSubject & NgRx
-- 🔢 Active task counter in navbar (powered by NgRx)
+- Create, edit, complete, reopen, and delete tasks.
+- Filter the list by all, active, or completed tasks.
+- Persist task data in browser localStorage.
+- Responsive UI with reusable standalone components.
+- Use RxJS BehaviorSubject for the task collection and NgRx for the navbar's active-task count.
+- Learn local task-workflow patterns and, when configured, offer next-step recommendations using a transparent TypeScript transition model.
+- Inspect transition counts, observed frequency, and recommendation matches/misses.
+- Switch between Passive, Advisory, and Adaptive modes, or reset the session model.
 
-## 🛠️ Tech Stack
+## LNASF workflow adaptation
 
-- Angular 19 (Standalone Components)
-- TypeScript
-- RxJS (BehaviorSubject)
-- **NgRx** (for state management demonstration)
-- HTML5 / CSS3 (Pure CSS)
-- Atomic Design pattern
-- UUID for unique IDs
+The application observes task-action categories, learns transitions between consecutive actions, predicts the most frequently observed next action, and runs an explicit decision policy before showing a recommendation.
 
+```text
+Task/filter event
+      |
+      v
+Observe action category
+      |
+      v
+Learn transition frequencies
+      |
+      v
+Predict likely next action
+      |
+      v
+Decision policy
+(minimum evidence + probability threshold + mode)
+      |
+      +---- Passive / weak evidence ----> normal task workflow
+      |
+      +---- Advisory -------------------> explain recommendation only
+      |
+      v
+Adaptive: offer an optional, user-triggered UI action
+      |
+      v
+Measure recommendation match or miss
+```
 
+The default mode is **Passive**, matching the approach used by the related LNASF examples. Passive mode learns without changing the UI. Advisory mode displays a recommendation without an action button. Adaptive mode may offer an explicit button for low-risk UI actions, such as opening the add-task form or changing the filter.
 
-## 🚀 Quick Start
+The default decision policy requires at least **3 transitions** from the current action and a leading observed frequency of **65% or higher**. These are initial engineering thresholds, not statistically optimized values. The model stays in memory for the current page session and does not send telemetry. It records action categories only—not task titles, descriptions, IDs, dates, or account data.
 
-### Prerequisites
+No mode automatically completes, edits, or deletes a task. Normal task controls remain the authoritative fallback. This is a limited reference implementation, not a complete realization of LNASF and not a claim of measured productivity improvement.
 
-- Node.js (v18 or later)
-- Angular CLI
+See [docs/LNASF-WORKFLOW-REFERENCE.md](./docs/LNASF-WORKFLOW-REFERENCE.md) for the model, operating modes, policy, boundaries, and evaluation guidance. The broader framework is described in [Learning-Native Adaptive Software Framework](https://github.com/peymanpro/learning-native-adaptive-software-framework).
 
-### Installation
+## Architecture
 
-```bash
-# Clone the repository
-git clone https://github.com/your-username/angular-standalone-task-manager.git
-
-# Navigate to project directory
-cd angular-standalone-task-manager
-
-# Install dependencies
-npm install
-
-# Run development server
-ng serve
-Navigate to http://localhost:4200/ to view the application.
-
-🧠 Architecture & State Management
-This project demonstrates two complementary approaches to state management:
-
-1. Service + BehaviorSubject (Primary)
-The main application logic uses a service-based architecture with RxJS BehaviorSubject for reactive state management. This approach is simple, lightweight, and perfectly suited for the application's current scope.
-
-2. NgRx (Demonstration)
-To showcase enterprise-grade state management capabilities, the project includes a minimal NgRx implementation for tracking the count of active (incomplete) tasks. This demonstrates:
-
-Actions: incrementActiveTasks, decrementActiveTasks, setActiveTasksCount
-
-Reducer: Manages the active count state
-
-Selector: selectActiveTasksCount for reading data in components
-
-Integration: NgRx store is registered in app.config.ts and used in the navbar component
-
-This hybrid approach proves that the architecture can scale to meet enterprise requirements while maintaining simplicity where appropriate.
-
-📁 Project Structure
-text
+```text
 src/app/
 ├── features/
-│   └── task/
-│       ├── task.model.ts          # Task interface
-│       ├── task.service.ts        # State management with BehaviorSubject
-│       └── store/                 # NgRx implementation
-│           ├── task.actions.ts    # NgRx Actions
-│           ├── task.reducer.ts    # NgRx Reducer
-│           └── task.selectors.ts  # NgRx Selectors
+│   ├── task/
+│   │   ├── task.model.ts
+│   │   ├── task.service.ts
+│   │   └── store/                 # NgRx active-task counter
+│   └── lnasf/
+│       ├── workflow-transition-model.ts
+│       ├── workflow-decision-policy.ts
+│       ├── adaptive-workflow.service.ts
+│       └── adaptive-workflow-panel.component.*
 ├── pages/
-│   ├── home/                      # Landing page
-│   ├── about/                     # About page
-│   └── task-manager/              # Main task management page
+│   ├── home/
+│   ├── about/
+│   └── task-manager/
 └── shared/
     ├── atoms/
-    │   └── button/                # Reusable button component
-    └── molecules/
-        ├── task-item/             # Individual task display
-        ├── task-edit/             # Add/Edit modal
-        └── navbar/                # Navigation bar with active task counter
-🎯 Key Features Explained
-Task Management
-Add Task: Click the "Add New Task" button to open a modal form
+    ├── molecules/
+    └── organisms/
+```
 
-Edit Task: Click the edit icon on any task to modify details
+The LNASF model and decision policy are framework-independent TypeScript classes. An Angular service owns session state, while the panel presents the current mode and runtime measurements.
 
-Delete Task: Remove tasks with a confirmation dialog
+## Tech stack
 
-Complete Task: Toggle task status with a checkbox
+- Angular 19 standalone components
+- TypeScript
+- RxJS BehaviorSubject
+- NgRx Store
+- HTML and CSS
+- UUID
+- Jasmine/Karma test setup
 
-Filtering
-Filter tasks by status using the dropdown selector
+## Run locally
 
-Default filter shows Active tasks (incomplete)
+Prerequisites: a Node.js version compatible with Angular 19 and npm.
 
-Routing
-Home: Landing page with welcome message
+```bash
+git clone https://github.com/peymanpro/angular-standalone-task-manager.git
+cd angular-standalone-task-manager
+npm install
+npm start
+```
 
-About: Project information
+Open http://localhost:4200.
 
-Task Manager: Full task management interface
+## Quality checks
 
-Active Task Counter (NgRx)
-The navbar displays the number of active (incomplete) tasks
+```bash
+npm run build
+npm test -- --watch=false
+```
 
-Updates automatically when tasks are added, completed, or deleted
+The LNASF model and decision policy include unit tests for transition prediction, mode separation, evidence thresholds, and reset behavior. Run these commands locally to verify the current checkout; performance gains have not been benchmarked.
 
-Powered by NgRx for demonstration purposes
+## License
 
-📦 Build
-bash
-# Production build
-ng build --configuration production
-
-# Development build
-ng build
-🧪 Testing
-bash
-# Unit tests
-ng test
-
-# End-to-end tests (coming soon)
-ng e2e
-📝 Commit History
-This project follows a clean commit history with meaningful messages:
-
-text
-feat(ngrx): add NgRx for tracking active task count in navbar
-feat(task-list): enhance task management with modal add, dropdown filter, and updated navbar layout
-fix(navbar,about): wrap SVG icons in span containers for better alignment and consistency
-feat(routing): add routing with Home and About pages
-fix(state): replace window.reload with BehaviorSubject and switch UI to English
-🤝 Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-📄 License
-This project is licensed under the MIT License.
+MIT
