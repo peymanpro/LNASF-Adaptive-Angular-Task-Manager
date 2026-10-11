@@ -1,20 +1,6 @@
-# Angular Standalone Task Manager
+# Angular LNASF Adaptive Task Manager
 
 A responsive task-management application built with Angular 19 standalone components. It demonstrates feature-oriented organization, a lightweight RxJS state service, a small NgRx counter, and a practical implementation of selected **Learning-Native Adaptive Software Framework (LNASF)** principles.
-
-## Screenshots
-
-### Home page
-![Home page](./public/home.png)
-
-### Task manager
-![Task manager](./public/mytaskmanagement.png)
-
-### Add task
-![Add task](./public/newtask.png)
-
-### Edit task
-![Edit task](./public/edittask.png)
 
 ## Features
 
