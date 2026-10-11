@@ -58,7 +58,7 @@ Adaptive: offer an optional, user-triggered UI action
 Measure recommendation match or miss
 ```
 
-The default mode is **Passive**, matching the approach used by the related LNASF examples. Passive mode learns without changing the UI. Advisory mode displays a recommendation without an action button. Adaptive mode may offer an explicit button for low-risk UI actions, such as opening the add-task form or changing the filter.
+The default mode is **Passive**, matching the approach used by the related LNASF examples. Passive mode continues learning and updating diagnostics without surfacing recommendations or changing task actions. Advisory mode displays a recommendation without an action button. Adaptive mode may offer an explicit button for low-risk UI actions, such as opening the add-task form or changing the filter.
 
 The default decision policy requires at least **3 transitions** from the current action and a leading observed frequency of **65% or higher**. These are initial engineering thresholds, not statistically optimized values. The model stays in memory for the current page session and does not send telemetry. It records action categories only—not task titles, descriptions, IDs, dates, or account data.
 
@@ -119,10 +119,10 @@ Open http://localhost:4200.
 
 ```bash
 npm run build
-npm test -- --watch=false
+npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-The LNASF model and decision policy include unit tests for transition prediction, mode separation, evidence thresholds, and reset behavior. Run these commands locally to verify the current checkout; performance gains have not been benchmarked.
+GitHub Actions runs the production build and unit tests on pushes and pull requests to master. The LNASF unit tests cover transition prediction, service feedback metrics, mode separation, evidence thresholds, and reset behavior. Performance gains have not been benchmarked.
 
 ## License
 

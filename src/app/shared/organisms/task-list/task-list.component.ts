@@ -108,7 +108,14 @@ export class TaskListComponent implements OnInit {
     }
 
     if (action === 'filter:all' || action === 'filter:active' || action === 'filter:completed') {
-      this.setFilter(action.slice('filter:'.length) as TaskFilter);
+      const nextFilter = action.slice('filter:'.length) as TaskFilter;
+      if (nextFilter === this.filter) {
+        // The user explicitly accepted the suggestion even though the view is already selected.
+        this.adaptiveWorkflow.recordAction(action);
+        this.applyFilter();
+      } else {
+        this.setFilter(nextFilter);
+      }
     }
   }
 }
