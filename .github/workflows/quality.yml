@@ -23,8 +23,15 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies and reconcile the lockfile
+        run: npm install
+
+      - name: Preserve the resolved lockfile for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: refreshed-package-lock
+          path: package-lock.json
+          retention-days: 1
 
       - name: Build production application
         run: npm run build
