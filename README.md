@@ -50,7 +50,7 @@ The default decision policy requires at least **3 transitions** from the current
 
 No mode automatically completes, edits, or deletes a task. Normal task controls remain the authoritative fallback. This is a limited reference implementation, not a complete realization of LNASF and not a claim of measured productivity improvement.
 
-See [docs/LNASF-WORKFLOW-REFERENCE.md](./docs/LNASF-WORKFLOW-REFERENCE.md) for the model, operating modes, policy, boundaries, and evaluation guidance. The broader framework is described in [Learning-Native Adaptive Software Framework](https://github.com/peymanpro/learning-native-adaptive-software-framework).
+See [docs/LNASF-WORKFLOW-REFERENCE.md](./docs/LNASF-WORKFLOW-REFERENCE.md) for the model, operating modes, policy, boundaries, and evaluation guidance. The broader framework is described in [Learning-Native Adaptive Software Framework](https://github.com/peymanpro/Learning-Native-Adaptive-Software-Framewor-Or-LNASF).
 
 ## Architecture
 
